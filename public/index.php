@@ -26,7 +26,7 @@ function tr(array $lang,string $key,string $fallback=''){return htmlspecialchars
   <div class="menu-label">MENU</div>
   <nav class="nav flex-column gap-1">
     <a class="nav-link active" href="#"><i class="bi bi-grid-1x2-fill"></i><span><?=tr($lang,'dashboard','Dashboard')?></span></a>
-    <a class="nav-link" href="#"><i class="bi bi-building"></i><span><?=tr($lang,'hotels','Hotels')?></span></a>
+    <a class="nav-link" href="/hotels/index.php"><i class="bi bi-building"></i><span><?=tr($lang,'hotels','Hotels')?></span></a>
     <a class="nav-link" href="#"><i class="bi bi-briefcase"></i><span><?=tr($lang,'services','Services')?></span></a>
     <a class="nav-link" href="#"><i class="bi bi-people"></i><span><?=tr($lang,'agencies','Agencies')?></span></a>
   </nav>
@@ -105,7 +105,7 @@ function tr(array $lang,string $key,string $fallback=''){return htmlspecialchars
     <div class="col-12 col-xl-4">
       <div class="content-card h-100">
         <h5>Quick Actions</h5>
-        <a class="quick-action" href="#"><i class="bi bi-building-add"></i><span><strong>Add Hotel</strong><small>Add hotel and room purchase rates</small></span></a>
+        <a class="quick-action" href="/hotels/create.php"><i class="bi bi-building-add"></i><span><strong>Add Hotel</strong><small>Add hotel and room purchase rates</small></span></a>
         <a class="quick-action" href="#"><i class="bi bi-plus-square"></i><span><strong>Add Service</strong><small>Add transfers, tours and activities</small></span></a>
         <a class="quick-action" href="#"><i class="bi bi-file-earmark-plus"></i><span><strong>New Quote</strong><small>Create a multi-currency quotation</small></span></a>
       </div>
