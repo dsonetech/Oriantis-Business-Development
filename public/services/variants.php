@@ -49,6 +49,7 @@ $variants=$vstmt->fetchAll();
 </div>
 
 <?php if(isset($_GET['saved'])):?><div class="alert alert-success"><?=e(t('variant_saved_success'))?></div><?php endif;?>
+<?php if(isset($_GET['deleted'])):?><div class="alert alert-success"><?=e(t('variant_deleted_success'))?></div><?php endif;?>
 
 <div class="row g-4">
  <div class="col-12 col-xl-4">
@@ -92,7 +93,14 @@ $variants=$vstmt->fetchAll();
        <td><?=$v['capacity']?(int)$v['capacity'].' PAX':'—'?></td>
        <td><?=$v['duration_hours']?e((string)$v['duration_hours']).' h':'—'?></td>
        <td><?=(int)$v['rates_count']?></td>
-       <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="variant-rates.php?id=<?=(int)$v['id']?>"><i class="bi bi-cash-stack me-1"></i><?=e(t('manage_rates'))?></a></td>
+       <td class="text-end">
+        <a class="btn btn-sm btn-outline-primary" href="variant-rates.php?id=<?=(int)$v['id']?>"><i class="bi bi-cash-stack me-1"></i><?=e(t('manage_rates'))?></a>
+        <form action="delete-variant.php" method="post" class="d-inline" onsubmit="return confirm('<?=e(t('confirm_delete_variant'))?>');">
+          <input type="hidden" name="id" value="<?=(int)$v['id']?>">
+          <input type="hidden" name="service_id" value="<?=$serviceId?>">
+          <button class="btn btn-sm btn-outline-danger" type="submit"><i class="bi bi-trash me-1"></i><?=e(t('delete'))?></button>
+        </form>
+       </td>
       </tr>
      <?php endforeach; endif;?>
      </tbody>
