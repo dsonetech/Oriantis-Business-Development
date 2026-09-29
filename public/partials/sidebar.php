@@ -28,7 +28,7 @@ $currentPage = $currentPage ?? '';
     <a class="nav-link <?= $currentPage === 'quotes' ? 'active' : '' ?>" href="#">
       <i class="bi bi-file-earmark-text"></i><span><?= e(t('quotes')) ?></span>
     </a>
-    <a class="nav-link <?= $currentPage === 'new_quote' ? 'active' : '' ?>" href="#">
+    <a class="nav-link <?= $currentPage === 'new_quote' ? 'active' : '' ?>" href="<?= base_url('quotes/create.php') ?>">
       <i class="bi bi-file-earmark-plus"></i><span><?= e(t('new_quote')) ?></span>
     </a>
   </nav>
