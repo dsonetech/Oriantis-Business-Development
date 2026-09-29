@@ -20,7 +20,6 @@ function load_env(string $path): void
         [$key, $value] = explode('=', $line, 2);
         $key = trim($key);
         $value = trim($value);
-        $value = trim($value, ""'");
 
         if ($key !== '' && getenv($key) === false) {
             putenv($key . '=' . $value);
