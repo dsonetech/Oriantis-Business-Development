@@ -24,6 +24,7 @@ $rs->execute(['id'=>$variantId]);$rates=$rs->fetchAll();
 <div class="mb-4"><a href="variants.php?id=<?=(int)$variant['service_id']?>" class="text-decoration-none small"><i class="bi bi-arrow-left me-1"></i><?=e(t('service_variants'))?></a>
 <h3 class="mt-2 mb-1"><?=e($langCode==='fr'?$variant['name_fr']:$variant['name_en'])?></h3></div>
 <?php if(isset($_GET['saved'])):?><div class="alert alert-success"><?=e(t('rate_saved_success'))?></div><?php endif;?>
+<?php if(isset($_GET['deleted'])):?><div class="alert alert-success"><?=e(t('rate_deleted_success'))?></div><?php endif;?>
 <div class="row g-4">
 <div class="col-12 col-xl-4"><div class="content-card">
 <h5><?=e(t('add_rate'))?></h5>
@@ -37,8 +38,8 @@ $rs->execute(['id'=>$variantId]);$rates=$rs->fetchAll();
 <button class="btn btn-primary w-100 mt-4"><?=e(t('add_rate'))?></button>
 </form></div></div>
 <div class="col-12 col-xl-8"><div class="content-card"><h5><?=e(t('purchase_rates'))?></h5>
-<table class="table align-middle"><thead><tr><th><?=e(t('period'))?></th><th><?=e(t('currency'))?></th><th class="text-end"><?=e(t('purchase_rate'))?></th></tr></thead><tbody>
-<?php if(!$rates):?><tr><td colspan="3" class="text-center text-muted py-5"><?=e(t('no_rates'))?></td></tr>
-<?php else:foreach($rates as $r):?><tr><td><?=($r['valid_from']||$r['valid_to'])?e(format_date($r['valid_from'])).' → '.e(format_date($r['valid_to'])):e(t('all_dates'))?></td><td><?=e($r['currency_code'])?></td><td class="text-end fw-semibold"><?=number_format((float)$r['amount'],2)?> <?=e($r['currency_code'])?></td></tr><?php endforeach;endif;?>
+<table class="table align-middle"><thead><tr><th><?=e(t('period'))?></th><th><?=e(t('currency'))?></th><th class="text-end"><?=e(t('purchase_rate'))?></th><th class="text-end"><?=e(t('actions'))?></th></tr></thead><tbody>
+<?php if(!$rates):?><tr><td colspan="4" class="text-center text-muted py-5"><?=e(t('no_rates'))?></td></tr>
+<?php else:foreach($rates as $r):?><tr><td><?=($r['valid_from']||$r['valid_to'])?e(format_date($r['valid_from'])).' → '.e(format_date($r['valid_to'])):e(t('all_dates'))?></td><td><?=e($r['currency_code'])?></td><td class="text-end fw-semibold"><?=number_format((float)$r['amount'],2)?> <?=e($r['currency_code'])?></td><td class="text-end"><form action="delete-variant-rate.php" method="post" class="d-inline" onsubmit="return confirm('<?=e(t('confirm_delete_rate'))?>');"><input type="hidden" name="id" value="<?=(int)$r['id']?>"><input type="hidden" name="variant_id" value="<?=$variantId?>"><button class="btn btn-sm btn-outline-danger" type="submit"><i class="bi bi-trash me-1"></i><?=e(t('delete'))?></button></form></td></tr><?php endforeach;endif;?>
 </tbody></table></div></div>
 </div></main></div></body></html>
