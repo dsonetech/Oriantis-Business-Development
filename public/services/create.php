@@ -28,7 +28,7 @@ $categories = db()->query("SELECT id, name_fr, name_en FROM service_categories W
   <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
       <h4 class="mb-1"><?= e(t('add_service')) ?></h4>
-      <p class="text-muted mb-0"><?= e(t('add_service_help')) ?></p>
+      <p class="text-muted mb-0"><?= e(t('add_service_help_simple')) ?></p>
     </div>
     <a href="index.php" class="btn btn-light border"><i class="bi bi-arrow-left me-2"></i><?= e(t('back')) ?></a>
   </div>
@@ -68,23 +68,10 @@ $categories = db()->query("SELECT id, name_fr, name_en FROM service_categories W
         </select>
       </div>
 
-      <div class="col-md-4">
-        <label class="form-label"><?= e(t('pricing_type')) ?> *</label>
-        <select name="pricing_type" class="form-select" required>
-          <option value="PER_UNIT"><?= e(t('per_unit')) ?></option>
-          <option value="PER_PAX"><?= e(t('per_pax')) ?></option>
-          <option value="PER_GROUP"><?= e(t('per_group')) ?></option>
-        </select>
-      </div>
-
-      <div class="col-md-4">
-        <label class="form-label"><?= e(t('capacity')) ?></label>
-        <input type="number" name="capacity" class="form-control" min="1" placeholder="22">
-      </div>
-
-      <div class="col-md-4">
-        <label class="form-label"><?= e(t('duration_hours')) ?></label>
-        <input type="number" name="duration_hours" class="form-control" min="0" step="0.5" placeholder="4">
+      <div class="col-12">
+        <div class="alert alert-primary-subtle border border-primary-subtle mb-0">
+          <i class="bi bi-info-circle me-2"></i><?= e(t('service_variant_note')) ?>
+        </div>
       </div>
 
       <div class="col-12">
