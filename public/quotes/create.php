@@ -9,7 +9,7 @@ $hotelRates=db()->query("SELECT hr.hotel_id,hr.accommodation_type_id,hr.amount,h
 $variants=db()->query("
  SELECT sv.id,sv.service_id,sv.name_fr,sv.name_en,sv.option_code,sv.pricing_type,sv.capacity,sv.duration_hours,
         s.name_fr service_fr,s.name_en service_en,sc.code category_code,sc.name_fr category_fr,sc.name_en category_en,
-        r.amount,c.code currency_code
+        r.amount,r.valid_from AS rate_valid_from,r.valid_to AS rate_valid_to,c.code currency_code
  FROM service_variants sv
  INNER JOIN services s ON s.id=sv.service_id
  INNER JOIN service_categories sc ON sc.id=s.category_id
@@ -47,6 +47,9 @@ $roomTypes=db()->query("SELECT id,code,name_fr,name_en,divisor FROM accommodatio
 <div class="col-md-3"><label class="form-label"><?=e(t('departure'))?></label><input id="departure" type="date" class="form-control"></div>
 <div class="col-md-6"><label class="form-label"><?=e(t('hotel'))?></label><select id="hotel" class="form-select"><option value=""><?=e(t('select_option'))?></option><?php foreach($hotels as $h):?><option value="<?=(int)$h['id']?>"><?=e($h['name'])?> (<?=e($h['currency_code'])?>)</option><?php endforeach;?></select></div>
 <div class="col-md-3"><label class="form-label">ADT</label><input id="adults" type="number" min="0" class="form-control" value="21"></div>
+<div class="col-md-3"><label class="form-label">CHD +6 WB</label><input id="childWb" type="number" min="0" class="form-control" value="0"></div>
+<div class="col-md-3"><label class="form-label">CHD -6 WOB</label><input id="childWob" type="number" min="0" class="form-control" value="0"></div>
+<div class="col-md-3"><label class="form-label">INF</label><input id="infants" type="number" min="0" class="form-control" value="0"></div>
 <div class="col-md-3"><label class="form-label"><?=e(t('selling_currency'))?></label><select id="currency" class="form-select"><?php foreach($currencies as $c):?><option value="<?=e($c['code'])?>" <?=$c['code']==='USD'?'selected':''?>><?=e($c['code'])?></option><?php endforeach;?></select></div>
 </div>
 
@@ -64,24 +67,28 @@ $roomTypes=db()->query("SELECT id,code,name_fr,name_en,divisor FROM accommodatio
 <div class="row g-3">
 <?php
 $grouped=[];
-foreach($variants as $v){$grouped[$v['category_code']][]=$v;}
-foreach($grouped as $cat=>$rows):
+foreach($variants as $v){
+    $cat=$v['category_code'];
+    $key=$v['option_code'] ?: ('VARIANT_'.$v['id']);
+    if(!isset($grouped[$cat])) $grouped[$cat]=['label_fr'=>$v['category_fr'],'label_en'=>$v['category_en'],'options'=>[]];
+    if(!isset($grouped[$cat]['options'][$key])){
+        $grouped[$cat]['options'][$key]=[
+            'key'=>$key,
+            'label'=>$v['option_code'] ? ucwords(strtolower(str_replace('_',' ',$v['option_code']))) : ($langCode==='fr'?$v['name_fr']:$v['name_en'])
+        ];
+    }
+}
+foreach($grouped as $cat=>$group):
 ?>
 <div class="col-md-6">
-<label class="form-label"><?=e($langCode==='fr'?$rows[0]['category_fr']:$rows[0]['category_en'])?></label>
-<select class="form-select service-select" data-category="<?=e($cat)?>">
+<label class="form-label"><?=e($langCode==='fr'?$group['label_fr']:$group['label_en'])?></label>
+<select class="form-select service-option-select" data-category="<?=e($cat)?>">
 <option value=""><?=e(t('not_included'))?></option>
-<?php foreach($rows as $v):?>
-<option value="<?=(int)$v['id']?>"
- data-price="<?=e((string)($v['amount']??0))?>"
- data-currency="<?=e($v['currency_code']??'QAR')?>"
- data-capacity="<?=e((string)($v['capacity']??0))?>"
- data-pricing="<?=e($v['pricing_type'])?>"
- data-duration="<?=e((string)($v['duration_hours']??0))?>">
-<?=e($langCode==='fr'?$v['name_fr']:$v['name_en'])?><?= $v['capacity']?' · '.$v['capacity'].' PAX':'' ?><?= $v['amount']!==null?' · '.number_format((float)$v['amount'],0).' '.e($v['currency_code']):'' ?>
-</option>
+<?php foreach($group['options'] as $opt):?>
+<option value="<?=e($opt['key'])?>"><?=e($opt['label'])?></option>
 <?php endforeach;?>
 </select>
+<div class="form-text"><?=e(t('automatic_capacity_selection'))?></div>
 </div>
 <?php endforeach;?>
 </div>
@@ -106,6 +113,7 @@ foreach($grouped as $cat=>$rows):
 
 <script>
 const HOTEL_RATES = <?=json_encode($hotelRates,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)?>;
+const SERVICE_VARIANTS = <?=json_encode($variants,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)?>;
 const FX = <?=json_encode($fxRows,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)?>;
 
 function nights(){
@@ -133,28 +141,57 @@ function rateFor(hotelId,typeId,date){
  return c.length?c[c.length-1]:null;
 }
 function money(v){return new Intl.NumberFormat('fr-FR',{maximumFractionDigits:0}).format(v);}
+function totalPax(){
+ return Number(document.getElementById('adults').value||0)
+      + Number(document.getElementById('childWb').value||0)
+      + Number(document.getElementById('childWob').value||0)
+      + Number(document.getElementById('infants').value||0);
+}
+function validServiceRate(v,date){
+ return (!v.rate_valid_from || v.rate_valid_from<=date) && (!v.rate_valid_to || v.rate_valid_to>=date);
+}
+function bestVariant(category,optionKey,pax,date){
+ const candidates=SERVICE_VARIANTS.filter(v=>{
+   const key=v.option_code || ('VARIANT_'+v.id);
+   return v.category_code===category && key===optionKey && v.amount!==null && validServiceRate(v,date);
+ });
+ let best=null;
+ candidates.forEach(v=>{
+   const cap=Number(v.capacity||0),price=Number(v.amount||0),pricing=v.pricing_type;
+   let qty=1;
+   if(pricing==='PER_UNIT' && cap>0) qty=Math.ceil(pax/cap);
+   if(pricing==='PER_PAX') qty=pax;
+   if(pricing==='PER_HOUR') qty=Number(v.duration_hours||1);
+   const qar=convert(price*qty,v.currency_code||'QAR','QAR');
+   if(!best || qar<best.totalQar || (qar===best.totalQar && cap<best.capacity)){
+      best={...v,qty,totalQar:qar,capacity:cap};
+   }
+ });
+ return best;
+}
 function calculateQuote(){
  const hotelId=Number(document.getElementById('hotel').value);
- const n=nights(),adt=Number(document.getElementById('adults').value||0);
- const cur=document.getElementById('currency').value,arrival=document.getElementById('arrival').value;
- if(!hotelId||!n||!adt){alert('Please select hotel, dates and PAX.');return;}
+ const n=nights();
+ const pax=totalPax();
+ const cur=document.getElementById('currency').value;
+ const arrival=document.getElementById('arrival').value;
+ if(!hotelId||!n||!pax){alert('Please select hotel, dates and PAX.');return;}
 
  let servicesTotalQAR=0,serviceLines=[];
- document.querySelectorAll('.service-select').forEach(sel=>{
-   const opt=sel.options[sel.selectedIndex];
-   if(!opt||!opt.value)return;
-   const price=Number(opt.dataset.price||0),from=opt.dataset.currency||'QAR';
-   const cap=Number(opt.dataset.capacity||0),pricing=opt.dataset.pricing;
-   let qty=1;
-   if(pricing==='PER_UNIT'&&cap>0)qty=Math.ceil(adt/cap);
-   if(pricing==='PER_PAX')qty=adt;
-   if(pricing==='PER_HOUR')qty=Number(opt.dataset.duration||1);
-   const total=convert(price*qty,from,'QAR');
-   servicesTotalQAR+=total;
-   serviceLines.push(opt.textContent.trim()+' × '+qty+' = '+money(total)+' QAR');
+ document.querySelectorAll('.service-option-select').forEach(sel=>{
+   if(!sel.value)return;
+   const best=bestVariant(sel.dataset.category,sel.value,pax,arrival);
+   if(!best){
+      serviceLines.push('<span class="text-danger">'+sel.dataset.category+': no valid rate</span>');
+      return;
+   }
+   servicesTotalQAR+=best.totalQar;
+   const label=best.name_fr && document.documentElement.lang==='fr' ? best.name_fr : best.name_en;
+   serviceLines.push(label+' × '+best.qty+' = '+money(best.totalQar)+' QAR');
  });
 
- const servicePaxQAR=servicesTotalQAR/adt;
+ const chargeablePax=Math.max(1,pax-Number(document.getElementById('infants').value||0));
+ const servicePaxQAR=servicesTotalQAR/chargeablePax;
  let rows=[];
  document.querySelectorAll('.roomqty').forEach(inp=>{
    const q=Number(inp.value||0); if(!q)return;
@@ -171,11 +208,12 @@ function calculateQuote(){
    rows.push({code,cost,profit,sell});
  });
 
- let html='<div class="small text-muted mb-3">'+document.getElementById('client').value+' · '+adt+' PAX · '+n+' nights</div>';
+ let html='<div class="small text-muted mb-3">'+document.getElementById('client').value+' · '+pax+' PAX · '+n+' nights</div>';
  html+='<div class="mb-3"><strong>Services</strong><div class="small mt-2">'+(serviceLines.length?serviceLines.join('<br>'):'—')+'</div></div>';
  html+='<table class="table table-sm"><thead><tr><th>Room</th><th class="text-end">Cost/PAX</th><th class="text-end">Profit</th><th class="text-end">Sell/PAX</th></tr></thead><tbody>';
  rows.forEach(r=>html+='<tr><td>'+r.code+'</td><td class="text-end">'+money(r.cost)+' '+cur+'</td><td class="text-end">'+money(r.profit)+' '+cur+'</td><td class="text-end fw-bold">'+money(r.sell)+' '+cur+'</td></tr>');
  html+='</tbody></table>';
+ html+='<div class="small text-muted mt-3">Service cost / chargeable pax: '+money(convert(servicePaxQAR,'QAR',cur))+' '+cur+'</div>';
  document.getElementById('preview').innerHTML=html;
 }
 </script>
