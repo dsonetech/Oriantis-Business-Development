@@ -109,8 +109,8 @@ try {
           <td><?= $service['duration_hours'] ? e((string)$service['duration_hours']) . ' h' : '—' ?></td>
           <td><?= (int)$service['rates_count'] ?></td>
           <td class="text-end">
-            <a href="rates.php?id=<?= (int)$service['id'] ?>" class="btn btn-sm btn-outline-primary">
-              <i class="bi bi-cash-stack me-1"></i><?= e(t('manage_rates')) ?>
+            <a href="variants.php?id=<?= (int)$service['id'] ?>" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-diagram-3 me-1"></i><?= e(t('manage_variants')) ?>
             </a>
           </td>
         </tr>
