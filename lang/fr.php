@@ -136,4 +136,11 @@ return [
     'without_dinner_price' => 'Prix sans dîner',
     'with_dinner_price' => 'Prix avec dîner',
     'price_per_pax' => 'Prix / PAX',
+    'delete' => 'Supprimer',
+    'service_deleted_success' => 'Service supprimé avec succès.',
+    'variant_deleted_success' => 'Option supprimée avec succès.',
+    'rate_deleted_success' => 'Tarif supprimé avec succès.',
+    'confirm_delete_service' => 'Supprimer ce service ainsi que toutes ses options et tarifs ?',
+    'confirm_delete_variant' => 'Supprimer cette option ainsi que tous ses tarifs ?',
+    'confirm_delete_rate' => 'Supprimer ce tarif ?',
 ];
