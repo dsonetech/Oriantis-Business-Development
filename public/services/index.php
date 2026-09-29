@@ -13,19 +13,16 @@ try {
             s.id,
             s.name_fr,
             s.name_en,
-            s.pricing_type,
-            s.capacity,
-            s.duration_hours,
             s.active,
             sc.name_fr AS category_fr,
             sc.name_en AS category_en,
             d.name_fr AS destination_fr,
             d.name_en AS destination_en,
-            COUNT(sr.id) AS rates_count
+            COUNT(DISTINCT sv.id) AS variants_count
         FROM services s
         INNER JOIN service_categories sc ON sc.id = s.category_id
         INNER JOIN destinations d ON d.id = s.destination_id
-        LEFT JOIN service_rates sr ON sr.service_id = s.id AND sr.active = 1
+        LEFT JOIN service_variants sv ON sv.service_id = s.id AND sv.active = 1
         GROUP BY s.id
         ORDER BY sc.name_en, s.name_en
     ");
@@ -76,17 +73,14 @@ try {
           <th><?= e(t('service_name')) ?></th>
           <th><?= e(t('category')) ?></th>
           <th><?= e(t('destination')) ?></th>
-          <th><?= e(t('pricing_type')) ?></th>
-          <th><?= e(t('capacity')) ?></th>
-          <th><?= e(t('duration')) ?></th>
-          <th><?= e(t('rates')) ?></th>
+          <th><?= e(t('variants')) ?></th>
           <th class="text-end"><?= e(t('actions')) ?></th>
         </tr>
       </thead>
       <tbody>
       <?php if (!$services): ?>
         <tr>
-          <td colspan="8">
+          <td colspan="5">
             <div class="empty-state py-5">
               <div class="empty-icon"><i class="bi bi-briefcase"></i></div>
               <h6><?= e(t('no_services')) ?></h6>
@@ -104,10 +98,7 @@ try {
           </td>
           <td><?= e($langCode === 'fr' ? $service['category_fr'] : $service['category_en']) ?></td>
           <td><?= e($langCode === 'fr' ? $service['destination_fr'] : $service['destination_en']) ?></td>
-          <td><span class="badge text-bg-light border"><?= e($service['pricing_type']) ?></span></td>
-          <td><?= $service['capacity'] ? (int)$service['capacity'] . ' PAX' : '—' ?></td>
-          <td><?= $service['duration_hours'] ? e((string)$service['duration_hours']) . ' h' : '—' ?></td>
-          <td><?= (int)$service['rates_count'] ?></td>
+          <td><span class="badge text-bg-light border"><?= (int)$service['variants_count'] ?></span></td>
           <td class="text-end">
             <a href="variants.php?id=<?= (int)$service['id'] ?>" class="btn btn-sm btn-outline-primary">
               <i class="bi bi-diagram-3 me-1"></i><?= e(t('manage_variants')) ?>
