@@ -172,7 +172,7 @@ $rates = $rateStmt->fetchAll();
               <td><?= e($rate['meal_plan']) ?></td>
               <td>
                 <?php if ($rate['valid_from'] || $rate['valid_to']): ?>
-                <?= e($rate['valid_from'] ?: '—') ?> → <?= e($rate['valid_to'] ?: '—') ?>
+                <?= e(format_date($rate['valid_from'])) ?> → <?= e(format_date($rate['valid_to'])) ?>
                 <?php else: ?>
                 <?= e(t('all_dates')) ?>
                 <?php endif; ?>
