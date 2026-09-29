@@ -65,6 +65,7 @@ INSERT INTO service_categories (code, name_fr, name_en, active) VALUES
 ('SAFARI', 'Safari', 'Safari', 1),
 ('SAFARI_LUXE', 'Safari Luxe', 'Safari Luxe', 1),
 ('BOAT', 'Bateau / Croisière', 'Boat / Cruise', 1),
+('GUIDE', 'Guide', 'Guide', 1),
 ('OTHER', 'Autres', 'Others', 1)
 ON DUPLICATE KEY UPDATE
 name_fr = VALUES(name_fr),
