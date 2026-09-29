@@ -104,7 +104,7 @@ try {
           <td><span class="badge text-bg-light border"><?= (int)$service['variants_count'] ?></span></td>
           <td class="text-end">
             <a href="variants.php?id=<?= (int)$service['id'] ?>" class="btn btn-sm btn-outline-primary">
-              <i class="bi bi-diagram-3 me-1"></i><?= e(t('manage_variants')) ?>
+              <i class="bi bi-sliders me-1"></i><?= e(t('options_rates')) ?>
             </a>
             <form action="delete.php" method="post" class="d-inline" onsubmit="return confirm('<?= e(t('confirm_delete_service')) ?>');">
               <input type="hidden" name="id" value="<?= (int)$service['id'] ?>">
