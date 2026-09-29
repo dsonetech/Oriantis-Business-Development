@@ -136,4 +136,11 @@ return [
     'without_dinner_price' => 'Without Dinner Price',
     'with_dinner_price' => 'With Dinner Price',
     'price_per_pax' => 'Price / PAX',
+    'delete' => 'Delete',
+    'service_deleted_success' => 'Service deleted successfully.',
+    'variant_deleted_success' => 'Variant deleted successfully.',
+    'rate_deleted_success' => 'Rate deleted successfully.',
+    'confirm_delete_service' => 'Delete this service and all its options/rates?',
+    'confirm_delete_variant' => 'Delete this option and all its rates?',
+    'confirm_delete_rate' => 'Delete this rate?',
 ];
