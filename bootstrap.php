@@ -60,4 +60,15 @@ function base_url(string $path = ''): string
     return '/' . ltrim($path, '/');
 }
 
+function format_date(?string $date): string
+{
+    if (!$date) {
+        return '—';
+    }
+
+    $timestamp = strtotime($date);
+
+    return $timestamp ? date('d/m/Y', $timestamp) : $date;
+}
+
 require_once __DIR__ . '/config/database.php';
