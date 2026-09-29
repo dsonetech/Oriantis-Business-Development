@@ -79,6 +79,9 @@ $rates = $rateStmt->fetchAll();
 <?php if (isset($_GET['rate_saved'])): ?>
 <div class="alert alert-success"><?= e(t('rate_saved_success')) ?></div>
 <?php endif; ?>
+<?php if (isset($_GET['rate_updated'])): ?>
+<div class="alert alert-success"><?= e(t('rate_updated_success')) ?></div>
+<?php endif; ?>
 
 <div class="row g-4">
   <div class="col-12 col-xl-4">
@@ -156,11 +159,12 @@ $rates = $rateStmt->fetchAll();
               <th><?= e(t('meal_plan')) ?></th>
               <th><?= e(t('period')) ?></th>
               <th class="text-end"><?= e(t('purchase_rate')) ?></th>
+              <th class="text-end"><?= e(t('actions')) ?></th>
             </tr>
           </thead>
           <tbody>
           <?php if (!$rates): ?>
-            <tr><td colspan="4" class="text-center text-muted py-5"><?= e(t('no_rates')) ?></td></tr>
+            <tr><td colspan="5" class="text-center text-muted py-5"><?= e(t('no_rates')) ?></td></tr>
           <?php else: ?>
             <?php foreach ($rates as $rate): ?>
             <tr>
@@ -174,6 +178,11 @@ $rates = $rateStmt->fetchAll();
                 <?php endif; ?>
               </td>
               <td class="text-end fw-semibold"><?= number_format((float)$rate['amount'], 2) ?> <?= e($hotel['currency_code']) ?></td>
+              <td class="text-end">
+                <a href="edit-rate.php?id=<?= (int)$rate['id'] ?>" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-pencil-square me-1"></i><?= e(t('edit')) ?>
+                </a>
+              </td>
             </tr>
             <?php endforeach; ?>
           <?php endif; ?>
