@@ -15,7 +15,7 @@ $currentPage = $currentPage ?? '';
     <a class="nav-link <?= $currentPage === 'hotels' ? 'active' : '' ?>" href="<?= base_url('hotels/index.php') ?>">
       <i class="bi bi-building"></i><span><?= e(t('hotels')) ?></span>
     </a>
-    <a class="nav-link <?= $currentPage === 'services' ? 'active' : '' ?>" href="#">
+    <a class="nav-link <?= $currentPage === 'services' ? 'active' : '' ?>" href="<?= base_url('services/index.php') ?>">
       <i class="bi bi-briefcase"></i><span><?= e(t('services')) ?></span>
     </a>
     <a class="nav-link <?= $currentPage === 'agencies' ? 'active' : '' ?>" href="#">
