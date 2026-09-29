@@ -56,3 +56,17 @@ WHERE b.code = 'EUR' AND t.code = 'DZD'
 AND NOT EXISTS (
     SELECT 1 FROM exchange_rates er WHERE er.base_currency_id = b.id AND er.target_currency_id = t.id AND er.active = 1
 );
+
+
+INSERT INTO service_categories (code, name_fr, name_en, active) VALUES
+('VISA', 'Visa', 'Visa', 1),
+('TRANSFER', 'Transfert', 'Transfer', 1),
+('CITY_TOUR', 'City Tour', 'City Tour', 1),
+('SAFARI', 'Safari', 'Safari', 1),
+('SAFARI_LUXE', 'Safari Luxe', 'Safari Luxe', 1),
+('BOAT', 'Bateau / Croisière', 'Boat / Cruise', 1),
+('OTHER', 'Autres', 'Others', 1)
+ON DUPLICATE KEY UPDATE
+name_fr = VALUES(name_fr),
+name_en = VALUES(name_en),
+active = 1;
