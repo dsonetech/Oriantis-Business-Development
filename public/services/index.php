@@ -64,6 +64,9 @@ try {
 <?php if (isset($_GET['created'])): ?>
 <div class="alert alert-success"><?= e(t('service_created_success')) ?></div>
 <?php endif; ?>
+<?php if (isset($_GET['deleted'])): ?>
+<div class="alert alert-success"><?= e(t('service_deleted_success')) ?></div>
+<?php endif; ?>
 
 <div class="content-card">
   <div class="table-responsive">
@@ -103,6 +106,12 @@ try {
             <a href="variants.php?id=<?= (int)$service['id'] ?>" class="btn btn-sm btn-outline-primary">
               <i class="bi bi-diagram-3 me-1"></i><?= e(t('manage_variants')) ?>
             </a>
+            <form action="delete.php" method="post" class="d-inline" onsubmit="return confirm('<?= e(t('confirm_delete_service')) ?>');">
+              <input type="hidden" name="id" value="<?= (int)$service['id'] ?>">
+              <button type="submit" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-trash me-1"></i><?= e(t('delete')) ?>
+              </button>
+            </form>
           </td>
         </tr>
         <?php endforeach; ?>
