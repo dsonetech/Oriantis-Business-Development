@@ -1,0 +1,32 @@
+-- Service variants + quote customer name
+CREATE TABLE IF NOT EXISTS service_variants (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    service_id BIGINT UNSIGNED NOT NULL,
+    option_code VARCHAR(50) NULL,
+    name_fr VARCHAR(150) NOT NULL,
+    name_en VARCHAR(150) NOT NULL,
+    pricing_type ENUM('PER_PAX','PER_UNIT','PER_GROUP','PER_HOUR') NOT NULL DEFAULT 'PER_UNIT',
+    capacity INT NULL,
+    duration_hours DECIMAL(5,2) NULL,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS service_variant_rates (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    service_variant_id BIGINT UNSIGNED NOT NULL,
+    currency_id BIGINT UNSIGNED NOT NULL,
+    amount DECIMAL(18,2) NOT NULL,
+    valid_from DATE NULL,
+    valid_to DATE NULL,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (service_variant_id) REFERENCES service_variants(id) ON DELETE CASCADE,
+    FOREIGN KEY (currency_id) REFERENCES currencies(id)
+);
+
+ALTER TABLE quotes
+    ADD COLUMN customer_name VARCHAR(200) NULL AFTER quote_number;
