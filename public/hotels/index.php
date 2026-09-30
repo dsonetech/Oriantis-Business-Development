@@ -68,6 +68,14 @@ try {
 <div class="alert alert-success"><?= e(t('hotel_created_success')) ?></div>
 <?php endif; ?>
 
+<?php if (isset($_GET['deleted'])): ?>
+<div class="alert alert-success"><?= e(t('hotel_deleted_success')) ?></div>
+<?php endif; ?>
+
+<?php if (isset($_GET['delete_error'])): ?>
+<div class="alert alert-danger"><?= e(t('hotel_delete_error')) ?></div>
+<?php endif; ?>
+
 <div class="content-card">
   <div class="table-responsive">
     <table class="table align-middle mb-0">
@@ -114,6 +122,12 @@ try {
             <a class="btn btn-sm btn-outline-primary" href="rates.php?id=<?= (int)$hotel['id'] ?>">
               <i class="bi bi-cash-stack me-1"></i><?= e(t('manage_rates')) ?>
             </a>
+            <form action="delete.php" method="post" class="d-inline" onsubmit="return confirm('<?= e(t('confirm_delete_hotel')) ?>');">
+              <input type="hidden" name="id" value="<?= (int)$hotel['id'] ?>">
+              <button type="submit" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-trash me-1"></i><?= e(t('delete')) ?>
+              </button>
+            </form>
           </td>
         </tr>
         <?php endforeach; ?>
