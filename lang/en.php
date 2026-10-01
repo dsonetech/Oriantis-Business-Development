@@ -207,4 +207,12 @@ return [
     'all_destinations' => 'All Destinations',
     'reset_filters' => 'Reset',
     'no_filter_results' => 'No services match the selected filters.',
+    'meeting_room' => 'Meeting Room Rental',
+    'conference_room' => 'Conference Room Rental',
+    'activity' => 'Activity',
+    'half_day_global_rate' => 'Half Day - Global Rate',
+    'full_day_global_rate' => 'Full Day - Global Rate',
+    'activity_pricing' => 'Activity Pricing',
+    'global_group_rate' => 'Global / Group Rate',
+    'capacity_optional' => 'Capacity (optional)',
 ];
