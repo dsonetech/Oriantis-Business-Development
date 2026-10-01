@@ -157,4 +157,13 @@ return [
     'no_options_help' => 'Create the service again with its operational options and prices.',
     'add_another_service' => 'Add Another Service',
     'pax' => 'PAX',
+    'service_business_logic_help' => 'Enter supplier rates exactly as they are purchased: per vehicle/boat, per PAX, or per hour.',
+    'vehicle_rental' => 'Vehicle Rental',
+    'half_day_rate' => 'Half Day 4-5 Hours',
+    'full_day_rate' => 'Full Day 8-9 Hours',
+    'vehicle_rate' => 'Vehicle Rate',
+    'dinner_rate_pax' => 'Dinner Rate / PAX',
+    'boat_rate' => 'Boat Rate',
+    'boat_transfer_note' => 'Transfer is managed separately in the Transfer category so the quote can select the most suitable vehicle automatically.',
+    'guide_separate_logic_help' => 'The guide is stored as an hourly cost and will be divided across the group in the quotation calculation.',
 ];
