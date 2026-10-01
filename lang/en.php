@@ -200,4 +200,11 @@ return [
     'automatic_best_choice' => 'Automatic — Best Choice',
     'manual_vehicle_choice_help' => 'Automatic mode selects the lowest-cost valid vehicle combination. You can override it and choose any available vehicle.',
     'manual_choice' => 'Manual choice',
+    'service_rate' => 'Service Rate',
+    'search' => 'Search',
+    'search_service_placeholder' => 'Service name, category or destination...',
+    'all_categories' => 'All Categories',
+    'all_destinations' => 'All Destinations',
+    'reset_filters' => 'Reset',
+    'no_filter_results' => 'No services match the selected filters.',
 ];
