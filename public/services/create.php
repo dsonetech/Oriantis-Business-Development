@@ -117,7 +117,8 @@ $currencies=db()->query("SELECT id,code FROM currencies WHERE active=1 ORDER BY 
   <h5><?=e(t('boat_details'))?></h5>
   <div class="row g-4 mt-1">
     <div class="col-md-4"><label class="form-label"><?=e(t('capacity_pax'))?> *</label><input type="number" min="1" name="boat_capacity" class="form-control" placeholder="40"></div>
-    <div class="col-md-4"><label class="form-label"><?=e(t('boat_rate'))?> *</label><div class="input-group"><input type="number" min="0" step=".01" name="boat_rate" class="form-control"><span class="input-group-text">QAR / boat</span></div></div>
+    <div class="col-md-4"><label class="form-label"><?=e(t('dhow_cruise_4h_rate'))?></label><div class="input-group"><input type="number" min="0" step=".01" name="boat_4h_rate" class="form-control"><span class="input-group-text">QAR / boat</span></div></div>
+    <div class="col-md-4"><label class="form-label"><?=e(t('dhow_cruise_7h_rate'))?></label><div class="input-group"><input type="number" min="0" step=".01" name="boat_7h_rate" class="form-control"><span class="input-group-text">QAR / boat</span></div></div>
     <div class="col-md-4"><label class="form-label"><?=e(t('dinner_rate_pax'))?></label><div class="input-group"><input type="number" min="0" step=".01" name="boat_dinner_rate" class="form-control"><span class="input-group-text">QAR / PAX</span></div></div>
   </div>
   <div class="form-text mt-2"><?=e(t('boat_transfer_note'))?></div>
