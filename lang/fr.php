@@ -197,4 +197,7 @@ return [
     'dhow_cruise_7h' => 'Dhow Cruise - 7 heures',
     'dhow_cruise_4h_rate' => 'Tarif Dhow Cruise 4 heures',
     'dhow_cruise_7h_rate' => 'Tarif Dhow Cruise 7 heures',
+    'automatic_best_choice' => 'Automatique — Meilleur choix',
+    'manual_vehicle_choice_help' => 'Le mode automatique choisit la combinaison valide la moins chère. Vous pouvez la remplacer et choisir vous-même le véhicule.',
+    'manual_choice' => 'Choix manuel',
 ];
