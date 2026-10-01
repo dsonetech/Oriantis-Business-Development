@@ -61,6 +61,7 @@ AND NOT EXISTS (
 INSERT INTO service_categories (code, name_fr, name_en, active) VALUES
 ('VISA', 'Visa', 'Visa', 1),
 ('TRANSFER', 'Transfert', 'Transfer', 1),
+('VEHICLE_RENTAL', 'Location véhicule', 'Vehicle Rental', 1),
 ('CITY_TOUR', 'City Tour', 'City Tour', 1),
 ('SAFARI', 'Safari', 'Safari', 1),
 ('SAFARI_LUXE', 'Safari Luxe', 'Safari Luxe', 1),
