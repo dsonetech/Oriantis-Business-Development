@@ -91,6 +91,29 @@ try{
       $add('GUIDE_HOURLY','Guide à l’heure','Hourly Guide','PER_HOUR',null,1,$num('city_guide_hour_rate'));
       break;
 
+    case 'MEETING_ROOM':
+      $capacity=(int)($_POST['meeting_capacity']??0);
+      if($capacity<=0)throw new RuntimeException('Meeting room capacity is required.');
+      $add('HALF_DAY','Demi-journée','Half Day','PER_GROUP',$capacity,4,$num('meeting_half_rate'));
+      $add('FULL_DAY','Journée complète','Full Day','PER_GROUP',$capacity,8,$num('meeting_full_rate'));
+      break;
+
+    case 'CONFERENCE_ROOM':
+      $capacity=(int)($_POST['conference_capacity']??0);
+      if($capacity<=0)throw new RuntimeException('Conference room capacity is required.');
+      $add('HALF_DAY','Demi-journée','Half Day','PER_GROUP',$capacity,4,$num('conference_half_rate'));
+      $add('FULL_DAY','Journée complète','Full Day','PER_GROUP',$capacity,8,$num('conference_full_rate'));
+      break;
+
+    case 'ACTIVITY':
+      $price=$num('activity_rate');
+      if($price===null)throw new RuntimeException('Activity rate is required.');
+      $pricing=$_POST['activity_pricing']??'PER_PAX';
+      if(!in_array($pricing,['PER_PAX','PER_GROUP'],true))$pricing='PER_PAX';
+      $capacity=trim((string)($_POST['activity_capacity']??''))!==''?(int)$_POST['activity_capacity']:null;
+      $add('DEFAULT',$nameFr,$nameEn,$pricing,$capacity,null,$price);
+      break;
+
     case 'VISA':
       $price=$num('visa_price');
       if($price===null)throw new RuntimeException('Visa price is required.');
