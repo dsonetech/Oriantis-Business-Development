@@ -200,4 +200,11 @@ return [
     'automatic_best_choice' => 'Automatique — Meilleur choix',
     'manual_vehicle_choice_help' => 'Le mode automatique choisit la combinaison valide la moins chère. Vous pouvez la remplacer et choisir vous-même le véhicule.',
     'manual_choice' => 'Choix manuel',
+    'service_rate' => 'Tarif service',
+    'search' => 'Recherche',
+    'search_service_placeholder' => 'Nom du service, catégorie ou destination...',
+    'all_categories' => 'Toutes les catégories',
+    'all_destinations' => 'Toutes les destinations',
+    'reset_filters' => 'Réinitialiser',
+    'no_filter_results' => 'Aucun service ne correspond aux filtres sélectionnés.',
 ];
