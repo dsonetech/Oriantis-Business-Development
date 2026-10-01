@@ -157,4 +157,13 @@ return [
     'no_options_help' => 'Recréez le service avec ses options opérationnelles et ses tarifs.',
     'add_another_service' => 'Ajouter un autre service',
     'pax' => 'PAX',
+    'service_business_logic_help' => 'Saisissez les tarifs fournisseur selon leur vraie facturation : par véhicule/bateau, par PAX ou par heure.',
+    'vehicle_rental' => 'Location véhicule',
+    'half_day_rate' => 'Demi-journée 4-5 heures',
+    'full_day_rate' => 'Journée complète 8-9 heures',
+    'vehicle_rate' => 'Tarif véhicule',
+    'dinner_rate_pax' => 'Tarif dîner / PAX',
+    'boat_rate' => 'Tarif bateau',
+    'boat_transfer_note' => 'Le transfert est géré séparément dans la catégorie Transfert afin que le devis choisisse automatiquement le véhicule adapté.',
+    'guide_separate_logic_help' => 'Le guide est enregistré comme coût horaire puis réparti sur le groupe lors du calcul du devis.',
 ];
