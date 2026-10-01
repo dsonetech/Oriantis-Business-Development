@@ -190,4 +190,11 @@ return [
     'four_hours' => '4 Hours',
     'eight_hours' => '8 Hours',
     'add_guide' => 'Add Guide',
+    'with_guide' => 'With Guide',
+    'half_day_4h' => 'Half Day - 4 Hours',
+    'full_day_8h' => 'Full Day - 8 Hours',
+    'dhow_cruise_4h' => 'Dhow Cruise - 4 Hours',
+    'dhow_cruise_7h' => 'Dhow Cruise - 7 Hours',
+    'dhow_cruise_4h_rate' => 'Dhow Cruise 4 Hours Rate',
+    'dhow_cruise_7h_rate' => 'Dhow Cruise 7 Hours Rate',
 ];
