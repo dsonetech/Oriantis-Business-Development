@@ -90,7 +90,7 @@ $roomTypes=db()->query("
 </div>
 
 <div class="row g-4">
-<div class="col-12 col-xl-7">
+<div class="col-12 col-xl-5">
 <div class="content-card">
 
 <div class="quote-step mb-3">
@@ -149,74 +149,101 @@ $roomTypes=db()->query("
 
 <div class="quote-step mb-3">
   <div class="d-flex align-items-center gap-2 mb-3"><span class="step-badge">3</span><h6 class="mb-0"><?=e(t('select_services'))?></h6></div>
-  <div class="row g-3">
-    <div class="col-md-6">
-      <div class="form-check form-switch mt-2">
-        <input class="form-check-input" type="checkbox" id="includeVisa">
-        <label class="form-check-label fw-semibold" for="includeVisa"><?=e(t('include_evisa'))?></label>
+
+  <div class="vstack gap-3">
+    <div class="border rounded-3 p-3">
+      <div class="d-flex align-items-center justify-content-between gap-3">
+        <div><strong>1. eVisa</strong><div class="small text-muted"><?=e(t('evisa_per_pax_help'))?></div></div>
+        <div class="form-check form-switch m-0"><input class="form-check-input service-toggle" type="checkbox" id="includeVisa"></div>
       </div>
-      <div class="form-text"><?=e(t('evisa_per_pax_help'))?></div>
     </div>
-    <div class="col-md-6">
-      <label class="form-label"><?=e(t('transfer'))?></label>
-      <select id="transferOption" class="form-select">
-        <option value=""><?=e(t('not_included'))?></option>
+
+    <div class="border rounded-3 p-3">
+      <div class="d-flex align-items-center justify-content-between gap-3 mb-2">
+        <div><strong>2. <?=e(t('transfer'))?></strong><div class="small text-muted"><?=e(t('transfer_auto_vehicle_help'))?></div></div>
+        <div class="form-check form-switch m-0"><input class="form-check-input service-toggle" type="checkbox" id="includeTransfer"></div>
+      </div>
+      <select id="transferOption" class="form-select service-control" disabled>
         <option value="ONE_WAY"><?=e(t('one_way'))?></option>
-        <option value="ROUND_TRIP"><?=e(t('round_trip'))?></option>
+        <option value="ROUND_TRIP" selected><?=e(t('round_trip'))?></option>
       </select>
-      <div class="form-text"><?=e(t('transfer_auto_vehicle_help'))?></div>
     </div>
 
-    <div class="col-md-6">
-      <label class="form-label"><?=e(t('safari'))?></label>
-      <select id="safariOption" class="form-select">
-        <option value=""><?=e(t('not_included'))?></option>
-        <option value="SAFARI"><?=e(t('safari_standard'))?></option>
-        <option value="SAFARI_LUXE"><?=e(t('safari_luxe'))?></option>
-      </select>
-      <div class="form-check form-switch mt-2">
-        <input class="form-check-input" type="checkbox" id="safariDinner">
-        <label class="form-check-label" for="safariDinner"><?=e(t('add_dinner'))?></label>
+    <div class="border rounded-3 p-3">
+      <div class="d-flex align-items-center justify-content-between gap-3 mb-2">
+        <div><strong>3. <?=e(t('city_tour'))?></strong></div>
+        <div class="form-check form-switch m-0"><input class="form-check-input service-toggle" type="checkbox" id="includeCityTour"></div>
+      </div>
+      <div class="row g-2">
+        <div class="col-md-7">
+          <select id="cityTourOption" class="form-select service-control" disabled>
+            <option value="4H"><?=e(t('half_day_4h'))?></option>
+            <option value="8H"><?=e(t('full_day_8h'))?></option>
+          </select>
+        </div>
+        <div class="col-md-5 d-flex align-items-center">
+          <div class="form-check form-switch">
+            <input class="form-check-input service-control" type="checkbox" id="cityGuide" disabled>
+            <label class="form-check-label" for="cityGuide"><?=e(t('with_guide'))?></label>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="col-md-6">
-      <label class="form-label"><?=e(t('boat_cruise'))?></label>
-      <select id="boatOption" class="form-select">
-        <option value=""><?=e(t('not_included'))?></option>
-        <option value="CRUISE"><?=e(t('include_boat_cruise'))?></option>
-      </select>
-      <div class="form-check form-switch mt-2">
-        <input class="form-check-input" type="checkbox" id="boatDinner">
-        <label class="form-check-label" for="boatDinner"><?=e(t('add_dinner'))?></label>
+    <div class="border rounded-3 p-3">
+      <div class="d-flex align-items-center justify-content-between gap-3 mb-2">
+        <div><strong>4. <?=e(t('boat_cruise'))?></strong></div>
+        <div class="form-check form-switch m-0"><input class="form-check-input service-toggle" type="checkbox" id="includeBoat"></div>
+      </div>
+      <div class="row g-2">
+        <div class="col-md-7">
+          <select id="boatOption" class="form-select service-control" disabled>
+            <option value="BOAT_4H"><?=e(t('dhow_cruise_4h'))?></option>
+            <option value="BOAT_7H"><?=e(t('dhow_cruise_7h'))?></option>
+          </select>
+        </div>
+        <div class="col-md-5 d-flex align-items-center">
+          <div class="form-check form-switch">
+            <input class="form-check-input service-control" type="checkbox" id="boatDinner" disabled>
+            <label class="form-check-label" for="boatDinner"><?=e(t('add_dinner'))?></label>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="col-md-6">
-      <label class="form-label"><?=e(t('city_tour'))?></label>
-      <select id="cityTourOption" class="form-select">
-        <option value=""><?=e(t('not_included'))?></option>
-        <option value="4H"><?=e(t('four_hours'))?></option>
-        <option value="8H"><?=e(t('eight_hours'))?></option>
-      </select>
-      <div class="form-check form-switch mt-2">
-        <input class="form-check-input" type="checkbox" id="cityGuide">
-        <label class="form-check-label" for="cityGuide"><?=e(t('add_guide'))?></label>
+    <div class="border rounded-3 p-3">
+      <div class="d-flex align-items-center justify-content-between gap-3 mb-2">
+        <div><strong>5. <?=e(t('safari'))?></strong></div>
+        <div class="form-check form-switch m-0"><input class="form-check-input service-toggle" type="checkbox" id="includeSafari"></div>
+      </div>
+      <div class="row g-2">
+        <div class="col-md-7">
+          <select id="safariOption" class="form-select service-control" disabled>
+            <option value="SAFARI"><?=e(t('safari_standard'))?></option>
+            <option value="SAFARI_LUXE"><?=e(t('safari_luxe'))?></option>
+          </select>
+        </div>
+        <div class="col-md-5 d-flex align-items-center">
+          <div class="form-check form-switch">
+            <input class="form-check-input service-control" type="checkbox" id="safariDinner" disabled>
+            <label class="form-check-label" for="safariDinner"><?=e(t('add_dinner'))?></label>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="col-md-6">
-      <label class="form-label"><?=e(t('vehicle_rental'))?></label>
-      <select id="rentalOption" class="form-select">
-        <option value=""><?=e(t('not_included'))?></option>
+    <div class="border rounded-3 p-3">
+      <div class="d-flex align-items-center justify-content-between gap-3 mb-2">
+        <div><strong>6. <?=e(t('vehicle_rental'))?></strong><div class="small text-muted"><?=e(t('automatic_capacity_selection'))?></div></div>
+        <div class="form-check form-switch m-0"><input class="form-check-input service-toggle" type="checkbox" id="includeRental"></div>
+      </div>
+      <select id="rentalOption" class="form-select service-control" disabled>
         <option value="HALF_DAY"><?=e(t('half_day_rate'))?></option>
         <option value="FULL_DAY"><?=e(t('full_day_rate'))?></option>
       </select>
-      <div class="form-text"><?=e(t('automatic_capacity_selection'))?></div>
     </div>
   </div>
 </div>
-
 <button class="btn btn-primary btn-lg w-100" type="button" onclick="calculateQuote()">
   <i class="bi bi-calculator me-2"></i><?=e(t('calculate_quote'))?>
 </button>
@@ -224,7 +251,7 @@ $roomTypes=db()->query("
 </div>
 </div>
 
-<div class="col-12 col-xl-5">
+<div class="col-12 col-xl-7">
 <div class="content-card sticky-top" style="top:20px">
   <h5 class="mb-3"><?=e(t('quote_preview'))?></h5>
   <div id="preview" class="text-muted"><?=e(t('quote_preview_simple_help'))?></div>
@@ -398,6 +425,18 @@ function escapeHtml(s){
   return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 }
 
+function bindServiceToggle(toggleId, controlIds){
+  const toggle=document.getElementById(toggleId);
+  const refresh=()=>controlIds.forEach(id=>{const el=document.getElementById(id); if(el) el.disabled=!toggle.checked;});
+  toggle.addEventListener('change',refresh);
+  refresh();
+}
+bindServiceToggle('includeTransfer',['transferOption']);
+bindServiceToggle('includeCityTour',['cityTourOption','cityGuide']);
+bindServiceToggle('includeBoat',['boatOption','boatDinner']);
+bindServiceToggle('includeSafari',['safariOption','safariDinner']);
+bindServiceToggle('includeRental',['rentalOption']);
+
 function calculateQuote(){
   const hotelId=Number(document.getElementById('hotel').value);
   const arrival=document.getElementById('arrival').value;
@@ -431,7 +470,7 @@ function calculateQuote(){
   }
 
   const transferOption=document.getElementById('transferOption').value;
-  if(transferOption){
+  if(document.getElementById('includeTransfer').checked){
     const transfer=bestTransfer(transferOption,pax,arrival);
     if(!transfer){
       serviceLines.push('<span class="text-danger">'+(IS_FR?'Aucun véhicule avec tarif valide pour ce transfert.':'No vehicle with a valid transfer rate.')+'</span>');
@@ -447,7 +486,7 @@ function calculateQuote(){
   }
 
   const safariCategory=document.getElementById('safariOption').value;
-  if(safariCategory){
+  if(document.getElementById('includeSafari').checked){
     const safari=bestUnit(safariCategory,'SAFARI_CAR',pax,arrival);
     if(!safari){
       serviceLines.push('<span class="text-danger">'+(IS_FR?'Aucun tarif Safari valide.':'No valid Safari rate.')+'</span>');
@@ -472,15 +511,18 @@ function calculateQuote(){
     }
   }
 
-  if(document.getElementById('boatOption').value){
-    const boat=bestUnit('BOAT','CRUISE',pax,arrival);
+  if(document.getElementById('includeBoat').checked){
+    const boatOption=document.getElementById('boatOption').value;
+    let boat=bestUnit('BOAT',boatOption,pax,arrival);
+    // Backward compatibility for old generic Boat Cruise data.
+    if(!boat && boatOption==='BOAT_4H') boat=bestUnit('BOAT','CRUISE',pax,arrival);
     if(!boat){
       serviceLines.push('<span class="text-danger">'+(IS_FR?'Aucun tarif Boat Cruise valide.':'No valid Boat Cruise rate.')+'</span>');
     }else{
       servicesTotalQar+=boat.totalQar;
       const boatName=IS_FR?boat.service_fr:boat.service_en;
       serviceLines.push(
-        '<div class="d-flex justify-content-between gap-3"><span>'+escapeHtml(boatName)+' · '+boat.qty+' × '+(IS_FR?'bateau':'boat')+'</span><strong>'+money(boat.totalQar)+' QAR</strong></div>'+
+        '<div class="d-flex justify-content-between gap-3"><span>'+escapeHtml(boatName)+' · '+(boatOption==='BOAT_7H'?'7h':'4h')+' · '+boat.qty+' × '+(IS_FR?'bateau':'boat')+'</span><strong>'+money(boat.totalQar)+' QAR</strong></div>'+
         '<div class="small text-muted">'+(IS_FR?'Capacité':'Capacity')+': '+boat.cap+' PAX · '+money(boat.totalQar/pax)+' QAR / PAX</div>'
       );
       if(document.getElementById('boatDinner').checked){
@@ -498,7 +540,7 @@ function calculateQuote(){
   }
 
   const cityOption=document.getElementById('cityTourOption').value;
-  if(cityOption){
+  if(document.getElementById('includeCityTour').checked){
     const city=bestUnit('CITY_TOUR',cityOption,pax,arrival);
     if(!city){
       serviceLines.push('<span class="text-danger">'+(IS_FR?'Aucun tarif City Tour valide.':'No valid City Tour rate.')+'</span>');
@@ -525,7 +567,7 @@ function calculateQuote(){
   }
 
   const rentalOption=document.getElementById('rentalOption').value;
-  if(rentalOption){
+  if(document.getElementById('includeRental').checked){
     const rental=bestUnit('VEHICLE_RENTAL',rentalOption,pax,arrival);
     if(!rental){
       serviceLines.push('<span class="text-danger">'+(IS_FR?'Aucun tarif location véhicule valide.':'No valid vehicle rental rate.')+'</span>');
