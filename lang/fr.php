@@ -207,4 +207,12 @@ return [
     'all_destinations' => 'Toutes les destinations',
     'reset_filters' => 'Réinitialiser',
     'no_filter_results' => 'Aucun service ne correspond aux filtres sélectionnés.',
+    'meeting_room' => 'Location salle de réunion',
+    'conference_room' => 'Location salle de conférence',
+    'activity' => 'Activité',
+    'half_day_global_rate' => 'Demi-journée - tarif global',
+    'full_day_global_rate' => 'Journée complète - tarif global',
+    'activity_pricing' => 'Tarification de l’activité',
+    'global_group_rate' => 'Tarif global / groupe',
+    'capacity_optional' => 'Capacité (optionnelle)',
 ];
