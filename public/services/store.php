@@ -75,9 +75,11 @@ try{
 
     case 'BOAT':
       $capacity=(int)($_POST['boat_capacity']??0);
-      $boat=$num('boat_rate');
-      if($capacity<=0||$boat===null)throw new RuntimeException('Boat capacity and rate are required.');
-      $add('CRUISE','Bateau / Croisière','Boat Cruise','PER_UNIT',$capacity,null,$boat);
+      $boat4=$num('boat_4h_rate');
+      $boat7=$num('boat_7h_rate');
+      if($capacity<=0||($boat4===null&&$boat7===null))throw new RuntimeException('Boat capacity and at least one cruise rate are required.');
+      $add('BOAT_4H','Dhow Cruise 4 heures','Dhow Cruise 4 Hours','PER_UNIT',$capacity,4,$boat4);
+      $add('BOAT_7H','Dhow Cruise 7 heures','Dhow Cruise 7 Hours','PER_UNIT',$capacity,7,$boat7);
       $add('DINNER','Dîner','Dinner','PER_PAX',null,null,$num('boat_dinner_rate'));
       break;
 
