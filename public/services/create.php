@@ -5,7 +5,13 @@ $currentPage='services';
 $pageTitle=t('add_service');
 
 $destinations=db()->query("SELECT id,name_fr,name_en FROM destinations WHERE active=1 ORDER BY name_en")->fetchAll();
-$categories=db()->query("SELECT id,code,name_fr,name_en FROM service_categories WHERE active=1 ORDER BY name_en")->fetchAll();
+$categories=db()->query("
+  SELECT id,code,name_fr,name_en
+  FROM service_categories
+  WHERE active=1
+    AND code IN ('VISA','TRANSFER','CITY_TOUR','SAFARI','BOAT','VEHICLE_RENTAL','MEETING_ROOM','CONFERENCE_ROOM','ACTIVITY')
+  ORDER BY FIELD(code,'VISA','TRANSFER','CITY_TOUR','SAFARI','BOAT','VEHICLE_RENTAL','MEETING_ROOM','CONFERENCE_ROOM','ACTIVITY')
+")->fetchAll();
 $currencies=db()->query("SELECT id,code FROM currencies WHERE active=1 ORDER BY code")->fetchAll();
 ?>
 <!doctype html>
@@ -37,16 +43,7 @@ $currencies=db()->query("SELECT id,code FROM currencies WHERE active=1 ORDER BY 
 
 <form method="post" action="store.php" class="content-card">
 <div class="row g-4">
-  <div class="col-md-4">
-    <label class="form-label"><?=e(t('category'))?> *</label>
-    <select name="category_id" id="category" class="form-select" required>
-      <option value=""><?=e(t('select_option'))?></option>
-      <?php foreach($categories as $c):?>
-      <option value="<?=(int)$c['id']?>" data-code="<?=e($c['code'])?>"><?=e($langCode==='fr'?$c['name_fr']:$c['name_en'])?></option>
-      <?php endforeach;?>
-    </select>
-  </div>
-  <div class="col-md-4">
+  <div class="col-md-6">
     <label class="form-label"><?=e(t('destination'))?> *</label>
     <select name="destination_id" class="form-select" required>
       <option value=""><?=e(t('select_option'))?></option>
@@ -55,7 +52,7 @@ $currencies=db()->query("SELECT id,code FROM currencies WHERE active=1 ORDER BY 
       <?php endforeach;?>
     </select>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-6">
     <label class="form-label"><?=e(t('currency'))?> *</label>
     <select name="currency_id" class="form-select" required>
       <?php foreach($currencies as $c):?>
@@ -63,16 +60,26 @@ $currencies=db()->query("SELECT id,code FROM currencies WHERE active=1 ORDER BY 
       <?php endforeach;?>
     </select>
   </div>
+
   <div class="col-md-6">
     <label class="form-label"><?=e(t('service_name_en'))?> *</label>
-    <input name="name_en" class="form-control" required placeholder="Land Cruiser / Van / Boat Cruise">
+    <input name="name_en" class="form-control" required placeholder="Van Sprinter / Dhow Cruise / Meeting Room">
   </div>
   <div class="col-md-6">
     <label class="form-label"><?=e(t('service_name_fr'))?> *</label>
-    <input name="name_fr" class="form-control" required placeholder="Land Cruiser / Van / Boat Cruise">
+    <input name="name_fr" class="form-control" required placeholder="Van Sprinter / Dhow Cruise / Salle de réunion">
+  </div>
+
+  <div class="col-12">
+    <label class="form-label"><?=e(t('category'))?> *</label>
+    <select name="category_id" id="category" class="form-select" required>
+      <option value=""><?=e(t('select_option'))?></option>
+      <?php foreach($categories as $c):?>
+      <option value="<?=(int)$c['id']?>" data-code="<?=e($c['code'])?>"><?=e($langCode==='fr'?$c['name_fr']:$c['name_en'])?></option>
+      <?php endforeach;?>
+    </select>
   </div>
 </div>
-
 <hr class="my-4">
 <div id="chooseHint" class="alert alert-light border mb-0"><i class="bi bi-arrow-up-circle me-2"></i><?=e(t('choose_service_category'))?></div>
 
@@ -104,15 +111,6 @@ $currencies=db()->query("SELECT id,code FROM currencies WHERE active=1 ORDER BY 
   </div>
 </div>
 
-<div class="service-fields" data-for="SAFARI_LUXE">
-  <h5><?=e(t('safari_luxe_details'))?></h5>
-  <div class="row g-4 mt-1">
-    <div class="col-md-4"><label class="form-label"><?=e(t('capacity_pax'))?> *</label><input type="number" min="1" name="safari_luxe_capacity" class="form-control" placeholder="6"></div>
-    <div class="col-md-4"><label class="form-label"><?=e(t('vehicle_rate'))?> *</label><div class="input-group"><input type="number" min="0" step=".01" name="safari_luxe_vehicle_rate" class="form-control"><span class="input-group-text">QAR / car</span></div></div>
-    <div class="col-md-4"><label class="form-label"><?=e(t('dinner_rate_pax'))?></label><div class="input-group"><input type="number" min="0" step=".01" name="safari_luxe_dinner_rate" class="form-control"><span class="input-group-text">QAR / PAX</span></div></div>
-  </div>
-</div>
-
 <div class="service-fields" data-for="BOAT">
   <h5><?=e(t('boat_details'))?></h5>
   <div class="row g-4 mt-1">
@@ -135,23 +133,42 @@ $currencies=db()->query("SELECT id,code FROM currencies WHERE active=1 ORDER BY 
   <div class="form-text mt-2"><?=e(t('guide_separate_logic_help'))?></div>
 </div>
 
+<div class="service-fields" data-for="MEETING_ROOM">
+  <h5><?=e(t('meeting_room'))?></h5>
+  <div class="row g-4 mt-1">
+    <div class="col-md-4"><label class="form-label"><?=e(t('capacity_pax'))?> *</label><input type="number" min="1" name="meeting_capacity" class="form-control"></div>
+    <div class="col-md-4"><label class="form-label"><?=e(t('half_day_global_rate'))?></label><div class="input-group"><input type="number" min="0" step=".01" name="meeting_half_rate" class="form-control"><span class="input-group-text">QAR / group</span></div></div>
+    <div class="col-md-4"><label class="form-label"><?=e(t('full_day_global_rate'))?></label><div class="input-group"><input type="number" min="0" step=".01" name="meeting_full_rate" class="form-control"><span class="input-group-text">QAR / group</span></div></div>
+  </div>
+</div>
+
+<div class="service-fields" data-for="CONFERENCE_ROOM">
+  <h5><?=e(t('conference_room'))?></h5>
+  <div class="row g-4 mt-1">
+    <div class="col-md-4"><label class="form-label"><?=e(t('capacity_pax'))?> *</label><input type="number" min="1" name="conference_capacity" class="form-control"></div>
+    <div class="col-md-4"><label class="form-label"><?=e(t('half_day_global_rate'))?></label><div class="input-group"><input type="number" min="0" step=".01" name="conference_half_rate" class="form-control"><span class="input-group-text">QAR / group</span></div></div>
+    <div class="col-md-4"><label class="form-label"><?=e(t('full_day_global_rate'))?></label><div class="input-group"><input type="number" min="0" step=".01" name="conference_full_rate" class="form-control"><span class="input-group-text">QAR / group</span></div></div>
+  </div>
+</div>
+
+<div class="service-fields" data-for="ACTIVITY">
+  <h5><?=e(t('activity'))?></h5>
+  <div class="row g-4 mt-1">
+    <div class="col-md-4">
+      <label class="form-label"><?=e(t('activity_pricing'))?> *</label>
+      <select name="activity_pricing" class="form-select">
+        <option value="PER_PAX"><?=e(t('per_pax'))?></option>
+        <option value="PER_GROUP"><?=e(t('global_group_rate'))?></option>
+      </select>
+    </div>
+    <div class="col-md-4"><label class="form-label"><?=e(t('capacity_optional'))?></label><input type="number" min="1" name="activity_capacity" class="form-control"></div>
+    <div class="col-md-4"><label class="form-label"><?=e(t('price'))?> *</label><div class="input-group"><input type="number" min="0" step=".01" name="activity_rate" class="form-control"><span class="input-group-text">QAR</span></div></div>
+  </div>
+</div>
+
 <div class="service-fields" data-for="VISA">
   <h5><?=e(t('visa_details'))?></h5>
   <div class="row g-4 mt-1"><div class="col-md-4"><label class="form-label"><?=e(t('price_per_pax'))?> *</label><div class="input-group"><input type="number" min="0" step=".01" name="visa_price" class="form-control"><span class="input-group-text">QAR / PAX</span></div></div></div>
-</div>
-
-<div class="service-fields" data-for="GUIDE">
-  <h5><?=e(t('guide_details'))?></h5>
-  <div class="row g-4 mt-1"><div class="col-md-4"><label class="form-label"><?=e(t('guide_price_hour'))?> *</label><div class="input-group"><input type="number" min="0" step=".01" name="guide_price" class="form-control"><span class="input-group-text">QAR / h</span></div></div></div>
-</div>
-
-<div class="service-fields" data-for="OTHER">
-  <h5><?=e(t('other_service_details'))?></h5>
-  <div class="row g-4 mt-1">
-    <div class="col-md-4"><label class="form-label"><?=e(t('price'))?> *</label><input type="number" min="0" step=".01" name="other_price" class="form-control"></div>
-    <div class="col-md-4"><label class="form-label"><?=e(t('pricing_type'))?></label><select name="other_pricing_type" class="form-select"><option value="PER_UNIT"><?=e(t('per_unit'))?></option><option value="PER_PAX"><?=e(t('per_pax'))?></option><option value="PER_GROUP"><?=e(t('per_group'))?></option><option value="PER_HOUR"><?=e(t('per_hour'))?></option></select></div>
-    <div class="col-md-4"><label class="form-label"><?=e(t('capacity'))?></label><input type="number" min="1" name="other_capacity" class="form-control"></div>
-  </div>
 </div>
 
 <div class="form-check form-switch mt-4">
