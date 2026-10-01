@@ -163,10 +163,20 @@ $roomTypes=db()->query("
         <div><strong>2. <?=e(t('transfer'))?></strong><div class="small text-muted"><?=e(t('transfer_auto_vehicle_help'))?></div></div>
         <div class="form-check form-switch m-0"><input class="form-check-input service-toggle" type="checkbox" id="includeTransfer"></div>
       </div>
-      <select id="transferOption" class="form-select service-control" disabled>
-        <option value="ONE_WAY"><?=e(t('one_way'))?></option>
-        <option value="ROUND_TRIP" selected><?=e(t('round_trip'))?></option>
-      </select>
+      <div class="row g-2">
+        <div class="col-md-5">
+          <select id="transferOption" class="form-select service-control" disabled>
+            <option value="ONE_WAY"><?=e(t('one_way'))?></option>
+            <option value="ROUND_TRIP" selected><?=e(t('round_trip'))?></option>
+          </select>
+        </div>
+        <div class="col-md-7">
+          <select id="transferVehicle" class="form-select service-control" disabled>
+            <option value="AUTO"><?=e(t('automatic_best_choice'))?></option>
+          </select>
+        </div>
+      </div>
+      <div id="transferChoiceHelp" class="form-text"><?=e(t('manual_vehicle_choice_help'))?></div>
     </div>
 
     <div class="border rounded-3 p-3">
@@ -352,27 +362,58 @@ function visaFor(date){
   return candidates[0];
 }
 
+function transferCandidates(option,pax,date){
+  return SERVICE_VARIANTS
+    .filter(v=>
+      v.category_code==='TRANSFER' &&
+      v.option_code===option &&
+      v.pricing_type==='PER_UNIT' &&
+      Number(v.capacity||0)>0 &&
+      validServiceRate(v,date)
+    )
+    .map(v=>{
+      const cap=Number(v.capacity);
+      const qty=Math.ceil(pax/cap);
+      const unitQar=convert(Number(v.amount),v.currency_code||'QAR','QAR');
+      const totalQar=qty*unitQar;
+      return {...v,qty,cap,unitQar,totalQar};
+    })
+    .sort((a,b)=>a.totalQar-b.totalQar || a.qty-b.qty || a.cap-b.cap);
+}
+
 function bestTransfer(option,pax,date){
-  const candidates=SERVICE_VARIANTS.filter(v=>
-    v.category_code==='TRANSFER' &&
-    v.option_code===option &&
-    v.pricing_type==='PER_UNIT' &&
-    Number(v.capacity||0)>0 &&
-    validServiceRate(v,date)
-  );
+  return transferCandidates(option,pax,date)[0] || null;
+}
 
-  let best=null;
-  candidates.forEach(v=>{
-    const cap=Number(v.capacity);
-    const qty=Math.ceil(pax/cap);
-    const unitQar=convert(Number(v.amount),v.currency_code||'QAR','QAR');
-    const totalQar=qty*unitQar;
+function selectedTransfer(option,pax,date){
+  const choice=document.getElementById('transferVehicle').value;
+  const candidates=transferCandidates(option,pax,date);
+  if(choice==='AUTO') return candidates[0] || null;
+  return candidates.find(v=>String(v.id)===String(choice)) || candidates[0] || null;
+}
 
-    if(!best || totalQar<best.totalQar || (totalQar===best.totalQar && qty<best.qty)){
-      best={...v,qty,cap,unitQar,totalQar};
-    }
-  });
-  return best;
+function refreshTransferVehicleChoices(){
+  const select=document.getElementById('transferVehicle');
+  if(!select)return;
+
+  const option=document.getElementById('transferOption').value;
+  const pax=Number(document.getElementById('pax').value||0);
+  const date=document.getElementById('arrival').value;
+  const previous=select.value || 'AUTO';
+
+  let html='<option value="AUTO">'+(IS_FR?'Automatique — meilleur choix':'Automatic — best choice')+'</option>';
+
+  if(option && pax>0 && date){
+    transferCandidates(option,pax,date).forEach(v=>{
+      const name=IS_FR?v.service_fr:v.service_en;
+      html+='<option value="'+v.id+'">'+
+        escapeHtml(name)+' · '+v.cap+' PAX · '+v.qty+' × · '+money(v.totalQar)+' QAR ('+money(v.totalQar/pax)+' QAR/PAX)'+
+      '</option>';
+    });
+  }
+
+  select.innerHTML=html;
+  if([...select.options].some(o=>o.value===previous)) select.value=previous;
 }
 
 
@@ -431,11 +472,16 @@ function bindServiceToggle(toggleId, controlIds){
   toggle.addEventListener('change',refresh);
   refresh();
 }
-bindServiceToggle('includeTransfer',['transferOption']);
+bindServiceToggle('includeTransfer',['transferOption','transferVehicle']);
 bindServiceToggle('includeCityTour',['cityTourOption','cityGuide']);
 bindServiceToggle('includeBoat',['boatOption','boatDinner']);
 bindServiceToggle('includeSafari',['safariOption','safariDinner']);
 bindServiceToggle('includeRental',['rentalOption']);
+
+document.getElementById('transferOption').addEventListener('change',refreshTransferVehicleChoices);
+document.getElementById('pax').addEventListener('input',refreshTransferVehicleChoices);
+document.getElementById('arrival').addEventListener('change',refreshTransferVehicleChoices);
+refreshTransferVehicleChoices();
 
 function calculateQuote(){
   const hotelId=Number(document.getElementById('hotel').value);
@@ -471,16 +517,17 @@ function calculateQuote(){
 
   const transferOption=document.getElementById('transferOption').value;
   if(document.getElementById('includeTransfer').checked){
-    const transfer=bestTransfer(transferOption,pax,arrival);
+    const transfer=selectedTransfer(transferOption,pax,arrival);
     if(!transfer){
       serviceLines.push('<span class="text-danger">'+(IS_FR?'Aucun véhicule avec tarif valide pour ce transfert.':'No vehicle with a valid transfer rate.')+'</span>');
     }else{
       servicesTotalQar+=transfer.totalQar;
       const vehicle=IS_FR?transfer.service_fr:transfer.service_en;
       const option=transferOption==='ROUND_TRIP'?(IS_FR?'Aller-retour':'Round Trip'):(IS_FR?'Aller simple':'One Way');
+      const manual=document.getElementById('transferVehicle').value!=='AUTO';
       serviceLines.push(
         '<div class="d-flex justify-content-between gap-3"><span>'+escapeHtml(option)+' · '+transfer.qty+' × '+escapeHtml(vehicle)+'</span><strong>'+money(transfer.totalQar)+' QAR</strong></div>'+
-        '<div class="small text-muted">'+(IS_FR?'Capacité':'Capacity')+': '+transfer.cap+' PAX · '+money(transfer.totalQar/pax)+' QAR / PAX</div>'
+        '<div class="small text-muted">'+(IS_FR?'Capacité':'Capacity')+': '+transfer.cap+' PAX · '+money(transfer.totalQar/pax)+' QAR / PAX'+(manual?' · '+(IS_FR?'Choix manuel':'Manual choice'):'')+'</div>'
       );
     }
   }
