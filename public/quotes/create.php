@@ -41,7 +41,7 @@ $variants=db()->query("
     )
     LEFT JOIN currencies c ON c.id=r.currency_id
     WHERE sv.active=1 AND s.active=1
-      AND sc.code IN ('VISA','TRANSFER')
+      AND sc.code IN ('VISA','TRANSFER','SAFARI','SAFARI_LUXE','BOAT','CITY_TOUR','GUIDE','VEHICLE_RENTAL')
     ORDER BY sc.code,sv.capacity,sv.name_en
 ")->fetchAll();
 
@@ -165,6 +165,54 @@ $roomTypes=db()->query("
         <option value="ROUND_TRIP"><?=e(t('round_trip'))?></option>
       </select>
       <div class="form-text"><?=e(t('transfer_auto_vehicle_help'))?></div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label"><?=e(t('safari'))?></label>
+      <select id="safariOption" class="form-select">
+        <option value=""><?=e(t('not_included'))?></option>
+        <option value="SAFARI"><?=e(t('safari_standard'))?></option>
+        <option value="SAFARI_LUXE"><?=e(t('safari_luxe'))?></option>
+      </select>
+      <div class="form-check form-switch mt-2">
+        <input class="form-check-input" type="checkbox" id="safariDinner">
+        <label class="form-check-label" for="safariDinner"><?=e(t('add_dinner'))?></label>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label"><?=e(t('boat_cruise'))?></label>
+      <select id="boatOption" class="form-select">
+        <option value=""><?=e(t('not_included'))?></option>
+        <option value="CRUISE"><?=e(t('include_boat_cruise'))?></option>
+      </select>
+      <div class="form-check form-switch mt-2">
+        <input class="form-check-input" type="checkbox" id="boatDinner">
+        <label class="form-check-label" for="boatDinner"><?=e(t('add_dinner'))?></label>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label"><?=e(t('city_tour'))?></label>
+      <select id="cityTourOption" class="form-select">
+        <option value=""><?=e(t('not_included'))?></option>
+        <option value="4H"><?=e(t('four_hours'))?></option>
+        <option value="8H"><?=e(t('eight_hours'))?></option>
+      </select>
+      <div class="form-check form-switch mt-2">
+        <input class="form-check-input" type="checkbox" id="cityGuide">
+        <label class="form-check-label" for="cityGuide"><?=e(t('add_guide'))?></label>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label"><?=e(t('vehicle_rental'))?></label>
+      <select id="rentalOption" class="form-select">
+        <option value=""><?=e(t('not_included'))?></option>
+        <option value="HALF_DAY"><?=e(t('half_day_rate'))?></option>
+        <option value="FULL_DAY"><?=e(t('full_day_rate'))?></option>
+      </select>
+      <div class="form-text"><?=e(t('automatic_capacity_selection'))?></div>
     </div>
   </div>
 </div>
@@ -300,6 +348,52 @@ function bestTransfer(option,pax,date){
   return best;
 }
 
+
+function bestUnit(category,option,pax,date){
+  const candidates=SERVICE_VARIANTS.filter(v=>
+    v.category_code===category &&
+    v.option_code===option &&
+    v.pricing_type==='PER_UNIT' &&
+    Number(v.capacity||0)>0 &&
+    validServiceRate(v,date)
+  );
+  let best=null;
+  candidates.forEach(v=>{
+    const cap=Number(v.capacity);
+    const qty=Math.ceil(pax/cap);
+    const unitQar=convert(Number(v.amount),v.currency_code||'QAR','QAR');
+    const totalQar=qty*unitQar;
+    if(!best || totalQar<best.totalQar || (totalQar===best.totalQar && qty<best.qty)){
+      best={...v,qty,cap,unitQar,totalQar};
+    }
+  });
+  return best;
+}
+
+function cheapestPerPax(category,option,date){
+  const candidates=SERVICE_VARIANTS.filter(v=>
+    v.category_code===category &&
+    v.option_code===option &&
+    v.pricing_type==='PER_PAX' &&
+    validServiceRate(v,date)
+  );
+  if(!candidates.length)return null;
+  candidates.sort((a,b)=>convert(Number(a.amount),a.currency_code||'QAR','QAR')-convert(Number(b.amount),b.currency_code||'QAR','QAR'));
+  return candidates[0];
+}
+
+function cheapestHourly(date){
+  const candidates=SERVICE_VARIANTS.filter(v=>
+    (v.category_code==='CITY_TOUR'||v.category_code==='GUIDE') &&
+    (v.option_code==='GUIDE_HOURLY'||v.option_code==='HOURLY') &&
+    v.pricing_type==='PER_HOUR' &&
+    validServiceRate(v,date)
+  );
+  if(!candidates.length)return null;
+  candidates.sort((a,b)=>convert(Number(a.amount),a.currency_code||'QAR','QAR')-convert(Number(b.amount),b.currency_code||'QAR','QAR'));
+  return candidates[0];
+}
+
 function escapeHtml(s){
   return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 }
@@ -348,6 +442,99 @@ function calculateQuote(){
       serviceLines.push(
         '<div class="d-flex justify-content-between gap-3"><span>'+escapeHtml(option)+' · '+transfer.qty+' × '+escapeHtml(vehicle)+'</span><strong>'+money(transfer.totalQar)+' QAR</strong></div>'+
         '<div class="small text-muted">'+(IS_FR?'Capacité':'Capacity')+': '+transfer.cap+' PAX · '+money(transfer.totalQar/pax)+' QAR / PAX</div>'
+      );
+    }
+  }
+
+  const safariCategory=document.getElementById('safariOption').value;
+  if(safariCategory){
+    const safari=bestUnit(safariCategory,'SAFARI_CAR',pax,arrival);
+    if(!safari){
+      serviceLines.push('<span class="text-danger">'+(IS_FR?'Aucun tarif Safari valide.':'No valid Safari rate.')+'</span>');
+    }else{
+      servicesTotalQar+=safari.totalQar;
+      const vehicle=IS_FR?safari.service_fr:safari.service_en;
+      serviceLines.push(
+        '<div class="d-flex justify-content-between gap-3"><span>Safari · '+safari.qty+' × '+escapeHtml(vehicle)+'</span><strong>'+money(safari.totalQar)+' QAR</strong></div>'+
+        '<div class="small text-muted">'+(IS_FR?'Capacité':'Capacity')+': '+safari.cap+' PAX · '+money(safari.totalQar/pax)+' QAR / PAX</div>'
+      );
+      if(document.getElementById('safariDinner').checked){
+        const dinner=cheapestPerPax(safariCategory,'DINNER',arrival);
+        if(dinner){
+          const perPax=convert(Number(dinner.amount),dinner.currency_code||'QAR','QAR');
+          const total=perPax*pax;
+          servicesTotalQar+=total;
+          serviceLines.push('<div class="d-flex justify-content-between gap-3"><span>'+(IS_FR?'Dîner Safari':'Safari Dinner')+' · '+pax+' PAX</span><strong>'+money(total)+' QAR</strong></div><div class="small text-muted">'+money(perPax)+' QAR / PAX</div>');
+        }else{
+          serviceLines.push('<span class="text-danger">'+(IS_FR?'Aucun tarif dîner Safari valide.':'No valid Safari dinner rate.')+'</span>');
+        }
+      }
+    }
+  }
+
+  if(document.getElementById('boatOption').value){
+    const boat=bestUnit('BOAT','CRUISE',pax,arrival);
+    if(!boat){
+      serviceLines.push('<span class="text-danger">'+(IS_FR?'Aucun tarif Boat Cruise valide.':'No valid Boat Cruise rate.')+'</span>');
+    }else{
+      servicesTotalQar+=boat.totalQar;
+      const boatName=IS_FR?boat.service_fr:boat.service_en;
+      serviceLines.push(
+        '<div class="d-flex justify-content-between gap-3"><span>'+escapeHtml(boatName)+' · '+boat.qty+' × '+(IS_FR?'bateau':'boat')+'</span><strong>'+money(boat.totalQar)+' QAR</strong></div>'+
+        '<div class="small text-muted">'+(IS_FR?'Capacité':'Capacity')+': '+boat.cap+' PAX · '+money(boat.totalQar/pax)+' QAR / PAX</div>'
+      );
+      if(document.getElementById('boatDinner').checked){
+        const dinner=cheapestPerPax('BOAT','DINNER',arrival);
+        if(dinner){
+          const perPax=convert(Number(dinner.amount),dinner.currency_code||'QAR','QAR');
+          const total=perPax*pax;
+          servicesTotalQar+=total;
+          serviceLines.push('<div class="d-flex justify-content-between gap-3"><span>'+(IS_FR?'Dîner croisière':'Cruise Dinner')+' · '+pax+' PAX</span><strong>'+money(total)+' QAR</strong></div><div class="small text-muted">'+money(perPax)+' QAR / PAX</div>');
+        }else{
+          serviceLines.push('<span class="text-danger">'+(IS_FR?'Aucun tarif dîner croisière valide.':'No valid cruise dinner rate.')+'</span>');
+        }
+      }
+    }
+  }
+
+  const cityOption=document.getElementById('cityTourOption').value;
+  if(cityOption){
+    const city=bestUnit('CITY_TOUR',cityOption,pax,arrival);
+    if(!city){
+      serviceLines.push('<span class="text-danger">'+(IS_FR?'Aucun tarif City Tour valide.':'No valid City Tour rate.')+'</span>');
+    }else{
+      servicesTotalQar+=city.totalQar;
+      const vehicle=IS_FR?city.service_fr:city.service_en;
+      const hours=cityOption==='8H'?8:4;
+      serviceLines.push(
+        '<div class="d-flex justify-content-between gap-3"><span>City Tour '+hours+'h · '+city.qty+' × '+escapeHtml(vehicle)+'</span><strong>'+money(city.totalQar)+' QAR</strong></div>'+
+        '<div class="small text-muted">'+money(city.totalQar/pax)+' QAR / PAX</div>'
+      );
+      if(document.getElementById('cityGuide').checked){
+        const guide=cheapestHourly(arrival);
+        if(guide){
+          const hourly=convert(Number(guide.amount),guide.currency_code||'QAR','QAR');
+          const total=hourly*hours;
+          servicesTotalQar+=total;
+          serviceLines.push('<div class="d-flex justify-content-between gap-3"><span>'+(IS_FR?'Guide':'Guide')+' · '+hours+'h × '+money(hourly)+' QAR</span><strong>'+money(total)+' QAR</strong></div><div class="small text-muted">'+money(total/pax)+' QAR / PAX</div>');
+        }else{
+          serviceLines.push('<span class="text-danger">'+(IS_FR?'Aucun tarif guide horaire valide.':'No valid hourly guide rate.')+'</span>');
+        }
+      }
+    }
+  }
+
+  const rentalOption=document.getElementById('rentalOption').value;
+  if(rentalOption){
+    const rental=bestUnit('VEHICLE_RENTAL',rentalOption,pax,arrival);
+    if(!rental){
+      serviceLines.push('<span class="text-danger">'+(IS_FR?'Aucun tarif location véhicule valide.':'No valid vehicle rental rate.')+'</span>');
+    }else{
+      servicesTotalQar+=rental.totalQar;
+      const vehicle=IS_FR?rental.service_fr:rental.service_en;
+      serviceLines.push(
+        '<div class="d-flex justify-content-between gap-3"><span>'+(rentalOption==='HALF_DAY'?(IS_FR?'Demi-journée':'Half Day'):(IS_FR?'Journée complète':'Full Day'))+' · '+rental.qty+' × '+escapeHtml(vehicle)+'</span><strong>'+money(rental.totalQar)+' QAR</strong></div>'+
+        '<div class="small text-muted">'+money(rental.totalQar/pax)+' QAR / PAX</div>'
       );
     }
   }
