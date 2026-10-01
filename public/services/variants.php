@@ -46,6 +46,8 @@ $vstmt=db()->prepare("
     WHERE sv.service_id=:id
     ORDER BY
         CASE sv.option_code
+            WHEN 'HALF_DAY' THEN 5
+            WHEN 'FULL_DAY' THEN 6
             WHEN 'ONE_WAY' THEN 10
             WHEN 'ROUND_TRIP' THEN 20
             WHEN 'WITHOUT_TRANSFER' THEN 30
@@ -54,8 +56,12 @@ $vstmt=db()->prepare("
             WHEN '4H_WITH_GUIDE' THEN 60
             WHEN '8H' THEN 70
             WHEN '8H_WITH_GUIDE' THEN 80
+            WHEN 'SAFARI_CAR' THEN 85
+            WHEN 'CRUISE' THEN 86
+            WHEN 'DINNER' THEN 87
             WHEN 'WITHOUT_DINNER' THEN 90
             WHEN 'WITH_DINNER' THEN 100
+            WHEN 'GUIDE_HOURLY' THEN 105
             WHEN 'EVISA' THEN 110
             WHEN 'HOURLY' THEN 120
             ELSE 999
@@ -68,6 +74,8 @@ $variants=$vstmt->fetchAll();
 function option_label(array $v, string $langCode): string {
     if ($langCode === 'fr') {
         return match($v['option_code']) {
+            'HALF_DAY' => 'Demi-journée 4-5 heures',
+            'FULL_DAY' => 'Journée complète 8-9 heures',
             'ONE_WAY' => 'Aller simple',
             'ROUND_TRIP' => 'Aller-retour',
             'WITHOUT_TRANSFER' => 'Sans transfert',
@@ -76,6 +84,10 @@ function option_label(array $v, string $langCode): string {
             '4H_WITH_GUIDE' => '4 heures + guide',
             '8H' => '8 heures',
             '8H_WITH_GUIDE' => '8 heures + guide',
+            'SAFARI_CAR' => 'Véhicule Safari',
+            'CRUISE' => 'Bateau / Croisière',
+            'DINNER' => 'Dîner',
+            'GUIDE_HOURLY' => 'Guide à l’heure',
             'WITHOUT_DINNER' => 'Sans dîner',
             'WITH_DINNER' => 'Avec dîner',
             'EVISA' => 'eVisa',
@@ -84,6 +96,8 @@ function option_label(array $v, string $langCode): string {
         };
     }
     return match($v['option_code']) {
+        'HALF_DAY' => 'Half Day 4-5 Hours',
+        'FULL_DAY' => 'Full Day 8-9 Hours',
         'ONE_WAY' => 'One Way',
         'ROUND_TRIP' => 'Round Trip',
         'WITHOUT_TRANSFER' => 'Without Transfer',
@@ -92,6 +106,10 @@ function option_label(array $v, string $langCode): string {
         '4H_WITH_GUIDE' => '4 Hours + Guide',
         '8H' => '8 Hours',
         '8H_WITH_GUIDE' => '8 Hours + Guide',
+        'SAFARI_CAR' => 'Safari Vehicle',
+        'CRUISE' => 'Boat Cruise',
+        'DINNER' => 'Dinner',
+        'GUIDE_HOURLY' => 'Hourly Guide',
         'WITHOUT_DINNER' => 'Without Dinner',
         'WITH_DINNER' => 'With Dinner',
         'EVISA' => 'eVisa',
