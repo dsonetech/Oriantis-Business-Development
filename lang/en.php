@@ -197,4 +197,7 @@ return [
     'dhow_cruise_7h' => 'Dhow Cruise - 7 Hours',
     'dhow_cruise_4h_rate' => 'Dhow Cruise 4 Hours Rate',
     'dhow_cruise_7h_rate' => 'Dhow Cruise 7 Hours Rate',
+    'automatic_best_choice' => 'Automatic — Best Choice',
+    'manual_vehicle_choice_help' => 'Automatic mode selects the lowest-cost valid vehicle combination. You can override it and choose any available vehicle.',
+    'manual_choice' => 'Manual choice',
 ];
