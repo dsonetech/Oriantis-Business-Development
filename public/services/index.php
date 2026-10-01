@@ -133,6 +133,7 @@ try{
 <?php if($dbError):?><div class="alert alert-danger"><?=e($dbError)?></div><?php endif;?>
 <?php if(isset($_GET['created'])):?><div class="alert alert-success"><?=e(t('service_created_success'))?></div><?php endif;?>
 <?php if(isset($_GET['deleted'])):?><div class="alert alert-success"><?=e(t('service_deleted_success'))?></div><?php endif;?>
+<?php if(isset($_GET['updated'])):?><div class="alert alert-success"><?=e(t('service_updated_success'))?></div><?php endif;?>
 
 <div class="filter-bar mb-3">
   <div class="row g-2 align-items-end">
@@ -240,6 +241,9 @@ try{
           <td><span class="badge text-bg-light border"><?=(int)$service['variants_count']?></span></td>
           <td><?=e($destinationName)?></td>
           <td class="text-end text-nowrap">
+            <a href="edit.php?id=<?=(int)$service['id']?>" class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-pencil me-1"></i><?=e(t('edit'))?>
+            </a>
             <a href="variants.php?id=<?=(int)$service['id']?>" class="btn btn-sm btn-outline-primary">
               <i class="bi bi-sliders me-1"></i><?=e(t('options_rates'))?>
             </a>
